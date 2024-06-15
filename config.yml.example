@@ -1,0 +1,4 @@
+env: "development" # staging / production
+log_level: "info" # warm
+server:
+  port: 8080
