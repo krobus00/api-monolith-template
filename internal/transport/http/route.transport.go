@@ -1,18 +1,21 @@
 package http
 
 import (
-	"net/http"
-
+	"github.com/api-monolith-template/internal/model/response"
 	"github.com/gin-gonic/gin"
 )
 
 func (t *Transport) InitRoute() {
-	t.router.Use(loggingMiddleware())
+	t.router.Use(customPanicHandler(), loggingMiddleware())
 
 	internalGroup := t.router.Group("/_internal")
 	internalGroup.GET("/healthz", func(c *gin.Context) {
-		c.JSON(http.StatusOK, gin.H{
-			"message": "OK",
-		})
+		resp := response.NewResponseOK()
+		c.JSON(resp.StatusCode, resp)
 	})
+
+	v1Group := t.router.Group("/v1")
+
+	authGroup := v1Group.Group("/auth")
+	authGroup.POST("/register", t.authController.Register)
 }

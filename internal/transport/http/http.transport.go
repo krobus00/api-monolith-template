@@ -1,9 +1,14 @@
 package http
 
-import "github.com/gin-gonic/gin"
+import (
+	"github.com/api-monolith-template/internal/transport/http/auth"
+	"github.com/gin-gonic/gin"
+)
 
 type Transport struct {
 	router *gin.Engine
+
+	authController *auth.Controller
 }
 
 func NewTransport() *Transport {
@@ -12,5 +17,10 @@ func NewTransport() *Transport {
 
 func (t *Transport) WithGinEngine(r *gin.Engine) *Transport {
 	t.router = r
+	return t
+}
+
+func (t *Transport) WithAuthController(c *auth.Controller) *Transport {
+	t.authController = c
 	return t
 }

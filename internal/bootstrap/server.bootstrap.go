@@ -7,12 +7,15 @@ import (
 
 	"github.com/api-monolith-template/internal/config"
 	"github.com/api-monolith-template/internal/infrastructure"
+	authSvc "github.com/api-monolith-template/internal/service/auth"
 	httpTransport "github.com/api-monolith-template/internal/transport/http"
+	authCtrl "github.com/api-monolith-template/internal/transport/http/auth"
 	"github.com/api-monolith-template/internal/util"
 	"github.com/sirupsen/logrus"
 )
 
 func StartServer() {
+	// init infra
 	infrastructure.InitializeDBConn()
 	db, err := infrastructure.DB.DB()
 	util.ContinueOrFatal(err)
@@ -22,9 +25,19 @@ func StartServer() {
 
 	r := infrastructure.NewGinEngine()
 
+	// init service
+	authService := authSvc.NewService()
+
+	// init controller
+	authController := authCtrl.
+		NewController().
+		WithAuthService(authService)
+
+	// init http transport
 	httpTransport.
 		NewTransport().
 		WithGinEngine(r).
+		WithAuthController(authController).
 		InitRoute()
 
 	srv := &http.Server{

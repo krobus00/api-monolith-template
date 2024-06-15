@@ -1,8 +1,10 @@
 package http
 
 import (
+	"net/http"
 	"time"
 
+	"github.com/api-monolith-template/internal/model/response"
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
 )
@@ -27,5 +29,23 @@ func loggingMiddleware() gin.HandlerFunc {
 		}).Info("Incoming request")
 
 		ctx.Next()
+	}
+}
+
+func customPanicHandler() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		defer func() {
+			if r := recover(); r != nil {
+				// Log the error
+				c.Error(r.(error))
+
+				// Respond with custom error message
+				c.JSON(http.StatusInternalServerError, response.BaseResponse{
+					Message: "internal server error",
+				})
+				c.Abort()
+			}
+		}()
+		c.Next()
 	}
 }
