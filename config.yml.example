@@ -1,4 +1,15 @@
 env: "development" # staging / production
 log_level: "info" # warm
+graceful_shutdown_timeout: "30s"
 server:
   port: 8080
+database:
+  dsn: "postgres://user:password@localhost:5432/api_monolith?sslmode=disable"
+  ping_interval: "30s"
+  reconnect_factor: 2
+  min_jitter: "200ms"
+  max_jitter: "500ms"
+  max_retry: 5
+  max_idle_conns: 5
+  max_open_conns: 20
+  max_conn_life_time: "1h"
