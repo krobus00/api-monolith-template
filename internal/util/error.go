@@ -29,7 +29,7 @@ func processValidationErr(fieldErrs validator.ValidationErrors) *response.BaseRe
 		validationError := response.ValidationError{
 			Field:   fieldError.Field(),
 			Tag:     fieldError.Tag(),
-			Message: fieldError.Error(),
+			Message: fieldError.Translate(UniversalTranslator.GetFallback()), // TODO: get lang from req header
 		}
 		validationErrors = append(validationErrors, validationError)
 	}
