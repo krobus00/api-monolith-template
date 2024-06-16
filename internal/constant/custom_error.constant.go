@@ -27,4 +27,14 @@ var (
 		StatusCode: http.StatusBadRequest,
 		Message:    "user not found",
 	}
+	ErrInvalidToken = response.CustomError{
+		Code:       "400_4",
+		StatusCode: http.StatusUnauthorized,
+		Message:    "invalid token",
+	}
+	ErrTokenExpired = response.CustomError{
+		Code:       "400_5",
+		StatusCode: http.StatusUnauthorized,
+		Message:    "token expired",
+	}
 )

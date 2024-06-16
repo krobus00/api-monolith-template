@@ -10,4 +10,5 @@ import (
 type AuthService interface {
 	Register(ctx context.Context, req *request.RegisterReq) (*response.BaseResponse, error)
 	Login(ctx context.Context, req *request.LoginReq) (*response.BaseResponse, error)
+	Info(ctx context.Context, req *request.AuthInfoReq) (*response.BaseResponse, error)
 }

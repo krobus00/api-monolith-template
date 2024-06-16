@@ -1,6 +1,7 @@
 package http
 
 import (
+	"github.com/api-monolith-template/internal/config"
 	"github.com/api-monolith-template/internal/model/response"
 	"github.com/gin-gonic/gin"
 )
@@ -19,4 +20,7 @@ func (t *Transport) InitRoute() {
 	authGroup := v1Group.Group("/auth")
 	authGroup.POST("/register", t.authController.Register)
 	authGroup.POST("/login", t.authController.Login)
+
+	authProtected := authGroup.Use(AuthMiddleware(config.Env.Token.AccessTokenSecret))
+	authProtected.GET("/info", t.authController.Info)
 }

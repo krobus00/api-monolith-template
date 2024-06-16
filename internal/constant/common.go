@@ -1,11 +1,12 @@
 package constant
 
+type CtxKey string
+
 const (
 	ProductionEnvironment = "production"
 
-	RequestID = "req-id"
-	UserID    = "user-id"
-	UserType  = "user-type"
+	RequestID = CtxKey("reqId")
+	UserID    = CtxKey("userId")
 
 	DB = "db"
 )

@@ -1,23 +1,25 @@
 package auth
 
 import (
+	"github.com/api-monolith-template/internal/constant"
 	"github.com/api-monolith-template/internal/model/request"
 	"github.com/api-monolith-template/internal/util"
 	"github.com/gin-gonic/gin"
 )
 
-func (c *Controller) Register(ginCtx *gin.Context) {
+func (c *Controller) Info(ginCtx *gin.Context) {
 	ctx := ginCtx.Request.Context()
-	req := &request.RegisterReq{}
+	req := &request.AuthInfoReq{}
 
-	err := ginCtx.ShouldBindJSON(&req)
+	userID, err := util.GetUserIDFromContext(ctx)
 	if err != nil {
-		util.HandleError(ginCtx, err)
+		util.HandleError(ginCtx, constant.ErrInvalidToken)
 		ginCtx.Abort()
 		return
 	}
 
-	resp, err := c.authService.Register(ctx, req)
+	req.UserID = *userID
+	resp, err := c.authService.Info(ctx, req)
 	if err != nil {
 		util.HandleError(ginCtx, err)
 		ginCtx.Abort()

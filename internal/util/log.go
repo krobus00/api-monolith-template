@@ -12,7 +12,6 @@ func NewDefaultLogger(ctx context.Context) *logrus.Entry {
 	return logrus.WithFields(logrus.Fields{
 		"requestID": ctx.Value(constant.RequestID),
 		"userID":    ctx.Value(constant.UserID),
-		"userType":  ctx.Value(constant.UserType),
 	})
 }
 

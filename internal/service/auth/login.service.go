@@ -54,7 +54,7 @@ func (s *Service) Login(ctx context.Context, req *request.LoginReq) (*response.B
 
 	return &response.BaseResponse{
 		Message: response.MessageOK,
-		Data: response.AuthResponse{
+		Data: response.AuthResp{
 			AccessToken:           accessToken,
 			AccessTokenExpiredAt:  accessExpiredAt,
 			RefreshToken:          refreshToken,

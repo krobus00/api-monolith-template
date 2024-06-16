@@ -13,12 +13,14 @@ func (c *Controller) Login(ginCtx *gin.Context) {
 	err := ginCtx.ShouldBindJSON(&req)
 	if err != nil {
 		util.HandleError(ginCtx, err)
+		ginCtx.Abort()
 		return
 	}
 
 	resp, err := c.authService.Login(ctx, req)
 	if err != nil {
 		util.HandleError(ginCtx, err)
+		ginCtx.Abort()
 		return
 	}
 
