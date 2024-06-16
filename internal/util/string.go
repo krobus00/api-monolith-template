@@ -5,7 +5,10 @@ import (
 	"encoding/base64"
 	"fmt"
 	"strings"
+	"time"
 
+	"github.com/api-monolith-template/internal/model/entity"
+	"github.com/golang-jwt/jwt/v4"
 	"golang.org/x/crypto/scrypt"
 )
 
@@ -41,4 +44,25 @@ func ComparePassword(hashedPassword, password string) (bool, error) {
 	}
 
 	return subtle.ConstantTimeCompare(hash, newHash) == 1, nil
+}
+
+func GenerateToken(secret string, userID string, tokenID string, expirationTime time.Duration) (string, time.Time, error) {
+	issuedAt := time.Now().UTC()
+	expiration := issuedAt.Add(expirationTime)
+
+	claims := &entity.Claims{
+		UserID: userID,
+		RegisteredClaims: jwt.RegisteredClaims{
+			ID:        tokenID,
+			IssuedAt:  jwt.NewNumericDate(issuedAt),
+			ExpiresAt: jwt.NewNumericDate(expiration),
+		},
+	}
+
+	// Convert secret to []byte
+	signingKey := []byte(secret)
+
+	jwtToken := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	token, err := jwtToken.SignedString(signingKey)
+	return token, issuedAt, err
 }

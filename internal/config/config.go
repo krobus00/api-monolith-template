@@ -27,7 +27,11 @@ type EnvConfig struct {
 }
 
 type Token struct {
-	PasswordSalt string `mapstructure:"password_salt"`
+	PasswordSalt         string        `mapstructure:"password_salt"`
+	AccessTokenSecret    string        `mapstructure:"access_token_secret"`
+	AccessTokenDuration  time.Duration `mapstructure:"access_token_duration"`
+	RefreshTokenDuration time.Duration `mapstructure:"refresh_token_duration"`
+	RefreshTokenSecret   string        `mapstructure:"refresh_token_secret"`
 }
 
 type Server struct {

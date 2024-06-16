@@ -1,5 +1,9 @@
 package response
 
+const (
+	MessageOK = "ok"
+)
+
 type CustomError struct {
 	Code       string
 	Message    string
@@ -10,8 +14,14 @@ func (m CustomError) Error() string {
 	return m.Message
 }
 
+func (m CustomError) ToResponse() BaseResponse {
+	return BaseResponse{
+		StatusCode: m.StatusCode,
+		Message:    m.Message,
+	}
+}
+
 type BaseResponse struct {
-	ErrorCode        string            `json:"-"`
 	StatusCode       int               `json:"-"`
 	Message          string            `json:"message"`
 	Data             any               `json:"data"`
@@ -27,6 +37,6 @@ type ValidationError struct {
 
 func NewResponseOK() *BaseResponse {
 	return &BaseResponse{
-		Message: "ok",
+		Message: MessageOK,
 	}
 }

@@ -18,4 +18,5 @@ func (t *Transport) InitRoute() {
 
 	authGroup := v1Group.Group("/auth")
 	authGroup.POST("/register", t.authController.Register)
+	authGroup.POST("/login", t.authController.Login)
 }

@@ -11,8 +11,8 @@ import (
 
 func HandleError(ctx *gin.Context, err error) {
 	switch cErr := err.(type) {
-	case *response.CustomError:
-		ctx.JSON(cErr.StatusCode, cErr.Message)
+	case response.CustomError:
+		ctx.JSON(cErr.StatusCode, cErr.ToResponse())
 	case validator.ValidationErrors:
 		validationErr := processValidationErr(cErr)
 		ctx.JSON(http.StatusInternalServerError, validationErr)
@@ -33,7 +33,7 @@ func processValidationErr(fieldErrs validator.ValidationErrors) *response.BaseRe
 		validationErrors = append(validationErrors, validationError)
 	}
 
-	resp := constant.ErrValidationError
+	resp := constant.ErrValidationError.ToResponse()
 	resp.ValidationErrors = validationErrors
 
 	return &resp

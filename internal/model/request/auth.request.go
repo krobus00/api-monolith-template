@@ -5,3 +5,8 @@ type RegisterReq struct {
 	Email    string `json:"email" binding:"required,email,unique_db=users:email"`
 	Password string `json:"password" binding:"required,min=8,max=30"`
 }
+
+type LoginReq struct {
+	Identifier string `json:"identifier" binding:"required"`
+	Password   string `json:"password" binding:"required"`
+}
