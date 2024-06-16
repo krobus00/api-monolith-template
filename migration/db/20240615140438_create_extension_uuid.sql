@@ -1,6 +1,6 @@
 -- +goose Up
 -- +goose StatementBegin
-CREATE EXTENSION "uuid-ossp";
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp"; 
 -- +goose StatementEnd
 
 -- +goose Down

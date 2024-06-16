@@ -11,6 +11,7 @@ func (m CustomError) Error() string {
 }
 
 type BaseResponse struct {
+	ErrorCode        string            `json:"-"`
 	StatusCode       int               `json:"-"`
 	Message          string            `json:"message"`
 	Data             any               `json:"data"`

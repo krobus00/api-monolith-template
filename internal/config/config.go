@@ -21,8 +21,13 @@ type EnvConfig struct {
 	Env                     string        `mapstructure:"env"`
 	LogLevel                string        `mapstructure:"log_level"`
 	GracefulShutdownTimeout time.Duration `mapstructure:"graceful_shutdown_timeout"`
+	Token                   Token         `mapstructure:"token"`
 	Server                  Server        `mapstructure:"server"`
 	Database                Database      `mapstructure:"database"`
+}
+
+type Token struct {
+	PasswordSalt string `mapstructure:"password_salt"`
 }
 
 type Server struct {

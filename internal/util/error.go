@@ -3,6 +3,7 @@ package util
 import (
 	"net/http"
 
+	"github.com/api-monolith-template/internal/constant"
 	"github.com/api-monolith-template/internal/model/response"
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
@@ -16,9 +17,7 @@ func HandleError(ctx *gin.Context, err error) {
 		validationErr := processValidationErr(cErr)
 		ctx.JSON(http.StatusInternalServerError, validationErr)
 	default:
-		ctx.JSON(http.StatusInternalServerError, response.BaseResponse{
-			Message: "internal server error",
-		})
+		ctx.JSON(http.StatusInternalServerError, constant.ErrInternalServerError)
 	}
 }
 
@@ -34,9 +33,8 @@ func processValidationErr(fieldErrs validator.ValidationErrors) *response.BaseRe
 		validationErrors = append(validationErrors, validationError)
 	}
 
-	return &response.BaseResponse{
-		StatusCode:       http.StatusBadRequest,
-		Message:          "validation error",
-		ValidationErrors: validationErrors,
-	}
+	resp := constant.ErrValidationError
+	resp.ValidationErrors = validationErrors
+
+	return &resp
 }

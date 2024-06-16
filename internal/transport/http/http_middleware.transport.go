@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/api-monolith-template/internal/model/response"
+	"github.com/api-monolith-template/internal/constant"
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
 )
@@ -36,13 +36,10 @@ func customPanicHandler() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		defer func() {
 			if r := recover(); r != nil {
-				// Log the error
-				c.Error(r.(error))
-
-				// Respond with custom error message
-				c.JSON(http.StatusInternalServerError, response.BaseResponse{
-					Message: "internal server error",
-				})
+				if err, ok := r.(error); ok {
+					logrus.Error(err)
+				}
+				c.JSON(http.StatusInternalServerError, constant.ErrInternalServerError)
 				c.Abort()
 			}
 		}()

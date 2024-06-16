@@ -17,6 +17,6 @@ func NewGinEngine() *gin.Engine {
 	r.Use(gin.Recovery())
 
 	// register custom validation
-	util.AddValidation()
+	util.AddValidation(DB)
 	return r
 }

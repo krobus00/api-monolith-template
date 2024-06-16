@@ -48,7 +48,7 @@ func init() {
 		logrus.SetFormatter(&logrus.JSONFormatter{})
 	} else {
 		logrus.SetFormatter(&logrus.TextFormatter{
-			DisableColors: true,
+			DisableColors: false,
 			FullTimestamp: true,
 		})
 	}

@@ -6,4 +6,6 @@ const (
 	RequestID = "req-id"
 	UserID    = "user-id"
 	UserType  = "user-type"
+
+	DB = "db"
 )

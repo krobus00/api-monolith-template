@@ -1,6 +1,8 @@
 env: "development" # staging / production
 log_level: "info" # warm
 graceful_shutdown_timeout: "30s"
+token:
+  password_salt: "b5zaUPemaUN3YVPQ" # random 16 char
 server:
   port: 8080
 database:

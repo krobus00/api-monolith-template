@@ -7,6 +7,7 @@ import (
 
 	"github.com/api-monolith-template/internal/config"
 	"github.com/api-monolith-template/internal/infrastructure"
+	userRepo "github.com/api-monolith-template/internal/repository/user"
 	authSvc "github.com/api-monolith-template/internal/service/auth"
 	httpTransport "github.com/api-monolith-template/internal/transport/http"
 	authCtrl "github.com/api-monolith-template/internal/transport/http/auth"
@@ -25,8 +26,15 @@ func StartServer() {
 
 	r := infrastructure.NewGinEngine()
 
+	// init repository
+	userRepository := userRepo.
+		NewRepository().
+		WithGormDB(infrastructure.DB)
+
 	// init service
-	authService := authSvc.NewService()
+	authService := authSvc.
+		NewService().
+		WithUserRepository(userRepository)
 
 	// init controller
 	authController := authCtrl.
