@@ -2,6 +2,7 @@ package http
 
 import (
 	"github.com/api-monolith-template/internal/config"
+	"github.com/api-monolith-template/internal/constant"
 	"github.com/api-monolith-template/internal/model/response"
 	"github.com/gin-gonic/gin"
 )
@@ -9,6 +10,7 @@ import (
 func (t *Transport) InitRoute() {
 	t.router.Use(customPanicHandler(), loggingMiddleware())
 
+	// handle health check
 	internalGroup := t.router.Group("/_internal")
 	internalGroup.GET("/healthz", func(c *gin.Context) {
 		resp := response.NewResponseOK()
@@ -25,4 +27,11 @@ func (t *Transport) InitRoute() {
 
 	authProtected := authGroup.Use(AuthMiddleware(config.Env.Token.AccessTokenSecret))
 	authProtected.GET("/info", t.authController.Info)
+
+	// handle route not found
+	t.router.NoRoute(func(c *gin.Context) {
+		resp := constant.ErrEndpointNotFound.ToResponse()
+		c.JSON(resp.StatusCode, resp)
+	})
+
 }
