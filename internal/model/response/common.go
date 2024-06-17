@@ -25,7 +25,6 @@ type BaseResponse struct {
 	StatusCode       int               `json:"-"`
 	Message          string            `json:"message"`
 	Data             any               `json:"data"`
-	Error            any               `json:"error"`
 	ValidationErrors []ValidationError `json:"validationErrors"`
 }
 

@@ -52,6 +52,8 @@ func (s *Service) Login(ctx context.Context, req *request.LoginReq) (*response.B
 		return nil, err
 	}
 
+	// TODO: store refresh token
+
 	return &response.BaseResponse{
 		Message: response.MessageOK,
 		Data: response.AuthResp{

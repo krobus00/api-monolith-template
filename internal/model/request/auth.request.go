@@ -16,3 +16,7 @@ type LoginReq struct {
 type AuthInfoReq struct {
 	UserID uuid.UUID `json:"-"`
 }
+
+type AuthRefreshReq struct {
+	UserID uuid.UUID `json:"-"`
+}
