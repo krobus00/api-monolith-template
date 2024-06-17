@@ -5,10 +5,15 @@ import (
 	"fmt"
 	"sync"
 
+	"github.com/api-monolith-template/internal/config"
 	"github.com/sirupsen/logrus"
 )
 
 func (r *Repository) DeleteCache(ctx context.Context, cacheKeyPatterns ...string) error {
+	if config.Env.Redis.IsCacheDisable {
+		return nil
+	}
+
 	var wg sync.WaitGroup
 	wg.Add(len(cacheKeyPatterns))
 

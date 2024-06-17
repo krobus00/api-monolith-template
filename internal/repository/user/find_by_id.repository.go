@@ -2,12 +2,14 @@ package user
 
 import (
 	"context"
+	"errors"
 
 	"github.com/api-monolith-template/internal/model/cachekey"
 	"github.com/api-monolith-template/internal/model/entity"
 	"github.com/api-monolith-template/internal/util"
 	"github.com/google/uuid"
 	"github.com/sirupsen/logrus"
+	"gorm.io/gorm"
 )
 
 func (r *Repository) FindByID(ctx context.Context, id uuid.UUID) (*entity.User, error) {
@@ -21,6 +23,9 @@ func (r *Repository) FindByID(ctx context.Context, id uuid.UUID) (*entity.User, 
 		result := new(entity.User)
 		tx := util.GetTxFromContext(ctx, r.db)
 		err := tx.Where("id = ? ", id).First(&result).Error
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, nil
+		}
 		if err != nil {
 			return nil, err
 		}

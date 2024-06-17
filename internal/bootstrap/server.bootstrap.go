@@ -29,8 +29,8 @@ func StartServer() {
 	util.ContinueOrFatal(err)
 
 	rdb := infrastructure.NewRedisClient()
-	_, err = rdb.Ping(ctx).Result()
-	util.ContinueOrFatal(err)
+	// _, err = rdb.Ping(ctx).Result()
+	// util.ContinueOrFatal(err)
 
 	r := infrastructure.NewGinEngine()
 

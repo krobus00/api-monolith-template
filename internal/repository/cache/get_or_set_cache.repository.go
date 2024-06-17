@@ -5,12 +5,18 @@ import (
 	"errors"
 	"reflect"
 
+	"github.com/api-monolith-template/internal/config"
 	"github.com/goccy/go-json"
+	"gorm.io/gorm"
 
 	"github.com/redis/go-redis/v9"
 )
 
 func (r *Repository) GetOrSetCache(ctx context.Context, key string, out any, fallbackFn func(ctx context.Context) (any, error), opts ...CacheOpt) error {
+	if config.Env.Redis.IsCacheDisable {
+		return r.callFallbackAndSetCache(ctx, key, fallbackFn, out, opts...)
+	}
+
 	valOut := reflect.ValueOf(out)
 
 	if valOut.Kind() != reflect.Ptr {
@@ -22,34 +28,28 @@ func (r *Repository) GetOrSetCache(ctx context.Context, key string, out any, fal
 		return err
 	}
 
-	// cache found
 	if err == nil {
 		return nil
 	}
 
-	// call fallback to get value from other source
+	return r.callFallbackAndSetCache(ctx, key, fallbackFn, out, opts...)
+}
+
+func (r *Repository) callFallbackAndSetCache(ctx context.Context, key string, fallbackFn func(ctx context.Context) (any, error), out any, opts ...CacheOpt) error {
 	value, err := fallbackFn(ctx)
-	// ignore record not found error
-	if err != nil {
+	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
 		return err
 	}
 
-	// set new cache
 	err = r.SetCache(ctx, key, value, opts...)
 	if err != nil {
 		return nil
 	}
 
-	// assign to out param
 	newCacheData, err := json.Marshal(value)
 	if err != nil {
 		return err
 	}
 
-	err = json.Unmarshal(newCacheData, &out)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return json.Unmarshal(newCacheData, out)
 }

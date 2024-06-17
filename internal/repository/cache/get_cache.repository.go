@@ -5,10 +5,15 @@ import (
 	"errors"
 	"reflect"
 
+	"github.com/api-monolith-template/internal/config"
 	"github.com/goccy/go-json"
 )
 
 func (r *Repository) GetCache(ctx context.Context, key string, out any, opts ...CacheOpt) error {
+	if config.Env.Redis.IsCacheDisable {
+		return nil
+	}
+
 	valOut := reflect.ValueOf(out)
 
 	if valOut.Kind() != reflect.Ptr {
@@ -20,7 +25,7 @@ func (r *Repository) GetCache(ctx context.Context, key string, out any, opts ...
 		return err
 	}
 
-	err = json.Unmarshal(val, &out)
+	err = json.Unmarshal(val, out)
 	if err != nil {
 		return err
 	}

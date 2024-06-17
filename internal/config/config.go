@@ -28,6 +28,7 @@ type EnvConfig struct {
 }
 
 type Redis struct {
+	IsCacheDisable       bool          `mapstructure:"is_cache_disable"`
 	CacheDSN             string        `mapstructure:"cache_dsn"`
 	DefaultCacheDuration time.Duration `mapstructure:"default_cache_duration"`
 	MaxRetry             int           `mapstructure:"max_retry"`

@@ -8,6 +8,10 @@ import (
 )
 
 func (r *Repository) SetCache(ctx context.Context, key string, value any, opts ...CacheOpt) error {
+	if config.Env.Redis.IsCacheDisable {
+		return nil
+	}
+
 	expDuration := config.Env.Redis.DefaultCacheDuration
 
 	cacheOpts := new(CacheOption)

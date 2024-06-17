@@ -23,12 +23,12 @@ func (s *Service) Login(ctx context.Context, req *request.LoginReq) (*response.B
 	})
 
 	user, err := s.userRepository.FindByIdentifier(ctx, req.Identifier)
-	if errors.Is(err, gorm.ErrRecordNotFound) {
-		return nil, constant.ErrUserNotFound
-	}
-	if err != nil {
+	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
 		logger.Error(err)
 		return nil, err
+	}
+	if user == nil {
+		return nil, constant.ErrUserNotFound
 	}
 
 	isPasswordMatch, err := util.ComparePassword(user.Password, req.Password)
