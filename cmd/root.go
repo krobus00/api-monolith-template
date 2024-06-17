@@ -6,6 +6,9 @@ package cmd
 import (
 	"os"
 
+	"github.com/api-monolith-template/internal/config"
+	"github.com/api-monolith-template/internal/constant"
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
@@ -34,13 +37,25 @@ func Execute() {
 }
 
 func init() {
-	// Here you will define your flags and configuration settings.
-	// Cobra supports persistent flags, which, if defined here,
-	// will be global for your application.
+	err := config.LoadConfig()
+	if err != nil {
+		logrus.Fatal(err)
+	}
 
-	// rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.api-monolith-template.yaml)")
+	logrus.SetReportCaller(true)
 
-	// Cobra also supports local flags, which will only run
-	// when this action is called directly.
-	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	if config.Env.Env == constant.ProductionEnvironment {
+		logrus.SetFormatter(&logrus.JSONFormatter{})
+	} else {
+		logrus.SetFormatter(&logrus.TextFormatter{
+			DisableColors: false,
+			FullTimestamp: true,
+		})
+	}
+
+	logLevel, err := logrus.ParseLevel(config.Env.LogLevel)
+	if err != nil {
+		logrus.Fatal(err)
+	}
+	logrus.SetLevel(logLevel)
 }
