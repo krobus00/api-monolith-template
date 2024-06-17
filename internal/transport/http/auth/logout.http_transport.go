@@ -7,9 +7,9 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func (c *Controller) RefreshToken(ginCtx *gin.Context) {
+func (c *Controller) Logout(ginCtx *gin.Context) {
 	ctx := ginCtx.Request.Context()
-	req := &request.AuthRefreshReq{}
+	req := &request.AuthLogoutReq{}
 
 	userID, err := util.GetUserIDFromContext(ctx)
 	if err != nil {
@@ -27,6 +27,6 @@ func (c *Controller) RefreshToken(ginCtx *gin.Context) {
 
 	req.UserID = *userID
 	req.TokenID = *tokenID
-	resp, err := c.authService.RefreshToken(ctx, req)
+	resp, err := c.authService.Logout(ctx, req)
 	util.HandleResponse(ginCtx, resp, err)
 }

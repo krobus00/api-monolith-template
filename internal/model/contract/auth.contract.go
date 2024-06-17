@@ -12,4 +12,5 @@ type AuthService interface {
 	Login(ctx context.Context, req *request.LoginReq) (*response.BaseResponse, error)
 	RefreshToken(ctx context.Context, req *request.AuthRefreshReq) (*response.BaseResponse, error)
 	Info(ctx context.Context, req *request.AuthInfoReq) (*response.BaseResponse, error)
+	Logout(ctx context.Context, req *request.AuthLogoutReq) (*response.BaseResponse, error)
 }

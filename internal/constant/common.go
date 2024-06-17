@@ -7,6 +7,10 @@ const (
 
 	RequestID = CtxKey("reqId")
 	UserID    = CtxKey("userId")
+	TokenID   = CtxKey("jti")
 
 	DB = "db"
+
+	AccessTokenType  = "accesToken"
+	RefreshTokenType = "refreshToken"
 )

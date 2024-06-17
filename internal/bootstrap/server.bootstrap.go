@@ -7,15 +7,19 @@ import (
 
 	"github.com/api-monolith-template/internal/config"
 	"github.com/api-monolith-template/internal/infrastructure"
+	cacheRepo "github.com/api-monolith-template/internal/repository/cache"
 	userRepo "github.com/api-monolith-template/internal/repository/user"
 	authSvc "github.com/api-monolith-template/internal/service/auth"
 	httpTransport "github.com/api-monolith-template/internal/transport/http"
 	authCtrl "github.com/api-monolith-template/internal/transport/http/auth"
+	middlewareCtrl "github.com/api-monolith-template/internal/transport/http/middleware"
 	"github.com/api-monolith-template/internal/util"
 	"github.com/sirupsen/logrus"
 )
 
 func StartServer() {
+	ctx := context.Background()
+
 	// init infra
 	infrastructure.InitializeDBConn()
 	db, err := infrastructure.DB.DB()
@@ -24,19 +28,34 @@ func StartServer() {
 	err = db.Ping()
 	util.ContinueOrFatal(err)
 
+	rdb := infrastructure.NewRedisClient()
+	if !config.Env.Redis.IsCacheDisable {
+		_, err = rdb.Ping(ctx).Result()
+		util.ContinueOrFatal(err)
+	}
+
 	r := infrastructure.NewGinEngine()
 
 	// init repository
+	cacheRepository := cacheRepo.
+		NewRepository().
+		WithRedisDB(rdb)
 	userRepository := userRepo.
 		NewRepository().
-		WithGormDB(infrastructure.DB)
+		WithGormDB(infrastructure.DB).
+		WithCacheRepository(cacheRepository)
 
 	// init service
 	authService := authSvc.
 		NewService().
-		WithUserRepository(userRepository)
+		WithUserRepository(userRepository).
+		WithCacheRepository(cacheRepository)
 
 	// init controller
+	middlewareController := middlewareCtrl.
+		NewController().
+		WithAuthService(authService).
+		WithCacheRepository(cacheRepository)
 	authController := authCtrl.
 		NewController().
 		WithAuthService(authService)
@@ -45,6 +64,7 @@ func StartServer() {
 	httpTransport.
 		NewTransport().
 		WithGinEngine(r).
+		WithMiddlewareController(middlewareController).
 		WithAuthController(authController).
 		InitRoute()
 
@@ -60,10 +80,13 @@ func StartServer() {
 		}
 	}()
 
-	wait := gracefulShutdown(context.Background(), config.Env.GracefulShutdownTimeout, map[string]operation{
+	wait := gracefulShutdown(ctx, config.Env.GracefulShutdownTimeout, map[string]operation{
 		"database connection": func(ctx context.Context) error {
 			infrastructure.StopTickerCh <- true
 			return db.Close()
+		},
+		"redis connection": func(ctx context.Context) error {
+			return rdb.Close()
 		},
 		"gin server": func(ctx context.Context) error {
 			return srv.Shutdown(ctx)

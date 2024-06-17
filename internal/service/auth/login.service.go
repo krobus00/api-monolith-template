@@ -7,8 +7,10 @@ import (
 
 	"github.com/api-monolith-template/internal/config"
 	"github.com/api-monolith-template/internal/constant"
+	"github.com/api-monolith-template/internal/model/cachekey"
 	"github.com/api-monolith-template/internal/model/request"
 	"github.com/api-monolith-template/internal/model/response"
+	"github.com/api-monolith-template/internal/repository/cache"
 	"github.com/api-monolith-template/internal/util"
 	"github.com/google/uuid"
 	"github.com/sirupsen/logrus"
@@ -21,12 +23,12 @@ func (s *Service) Login(ctx context.Context, req *request.LoginReq) (*response.B
 	})
 
 	user, err := s.userRepository.FindByIdentifier(ctx, req.Identifier)
-	if errors.Is(err, gorm.ErrRecordNotFound) {
-		return nil, constant.ErrUserNotFound
-	}
-	if err != nil {
+	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
 		logger.Error(err)
 		return nil, err
+	}
+	if user == nil {
+		return nil, constant.ErrUserNotFound
 	}
 
 	isPasswordMatch, err := util.ComparePassword(user.Password, req.Password)
@@ -39,21 +41,25 @@ func (s *Service) Login(ctx context.Context, req *request.LoginReq) (*response.B
 		return nil, constant.ErrPasswordNotMatch
 	}
 
-	accessTokenID := uuid.New()
-	accessToken, accessExpiredAt, err := util.GenerateToken(config.Env.Token.AccessTokenSecret, user.ID.String(), accessTokenID.String(), config.Env.Token.AccessTokenDuration)
+	tokenPairID := uuid.New()
+	accessToken, accessExpiredAt, err := util.GenerateToken(config.Env.Token.AccessTokenSecret, user.ID.String(), tokenPairID.String(), config.Env.Token.AccessTokenDuration)
 	if err != nil {
 		logger.Error(err)
 		return nil, err
 	}
 
-	refreshTokenID := uuid.New()
-	refreshToken, refreshExpiredAt, err := util.GenerateToken(config.Env.Token.RefreshTokenSecret, user.ID.String(), refreshTokenID.String(), config.Env.Token.RefreshTokenDuration)
+	refreshToken, refreshExpiredAt, err := util.GenerateToken(config.Env.Token.RefreshTokenSecret, user.ID.String(), tokenPairID.String(), config.Env.Token.RefreshTokenDuration)
 	if err != nil {
 		logger.Error(err)
 		return nil, err
 	}
 
-	// TODO: store refresh token
+	cacheKey := cachekey.NewRefreshTokenCacheKey(user.ID.String(), tokenPairID.String())
+	err = s.cacheRepository.SetCache(ctx, cacheKey, tokenPairID.String(), cache.WithCustomExpiredDuration(config.Env.Token.RefreshTokenDuration))
+	if err != nil {
+		logger.Error(err)
+		return nil, err
+	}
 
 	return &response.BaseResponse{
 		Message: response.MessageOK,

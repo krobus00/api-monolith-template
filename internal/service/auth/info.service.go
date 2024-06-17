@@ -17,12 +17,12 @@ func (s *Service) Info(ctx context.Context, req *request.AuthInfoReq) (*response
 	logger := util.NewDefaultLogger(ctx)
 
 	user, err := s.userRepository.FindByID(ctx, req.UserID)
-	if errors.Is(err, gorm.ErrRecordNotFound) {
-		return nil, constant.ErrUserNotFound
-	}
-	if err != nil {
+	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
 		logger.Error(err)
 		return nil, err
+	}
+	if user == nil {
+		return nil, constant.ErrUserNotFound
 	}
 
 	return &response.BaseResponse{
