@@ -7,8 +7,10 @@ import (
 
 	"github.com/api-monolith-template/internal/config"
 	"github.com/api-monolith-template/internal/constant"
+	"github.com/api-monolith-template/internal/model/cachekey"
 	"github.com/api-monolith-template/internal/model/request"
 	"github.com/api-monolith-template/internal/model/response"
+	"github.com/api-monolith-template/internal/repository/cache"
 	"github.com/api-monolith-template/internal/util"
 	"github.com/google/uuid"
 	"github.com/sirupsen/logrus"
@@ -53,7 +55,12 @@ func (s *Service) Login(ctx context.Context, req *request.LoginReq) (*response.B
 		return nil, err
 	}
 
-	// TODO: store refresh token
+	cacheKey := cachekey.NewRefreshTokenCacheKey(user.ID.String(), refreshTokenID.String())
+	err = s.cacheRepository.SetCache(ctx, cacheKey, refreshToken, cache.WithCustomExpiredDuration(config.Env.Token.RefreshTokenDuration))
+	if err != nil {
+		logger.Error(err)
+		return nil, err
+	}
 
 	return &response.BaseResponse{
 		Message: response.MessageOK,

@@ -6,7 +6,6 @@ import (
 	"reflect"
 
 	"github.com/goccy/go-json"
-	"gorm.io/gorm"
 
 	"github.com/redis/go-redis/v9"
 )
@@ -31,8 +30,8 @@ func (r *Repository) GetOrSetCache(ctx context.Context, key string, out any, fal
 	// call fallback to get value from other source
 	value, err := fallbackFn(ctx)
 	// ignore record not found error
-	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
-		return nil
+	if err != nil {
+		return err
 	}
 
 	// set new cache

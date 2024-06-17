@@ -25,6 +25,14 @@ func GetUserIDFromContext(ctx context.Context) (*uuid.UUID, error) {
 	return &userID, nil
 }
 
+func GetTokenIDFromContext(ctx context.Context) (*uuid.UUID, error) {
+	tokenID, err := uuid.Parse(fmt.Sprintf("%s", ctx.Value(constant.TokenID)))
+	if err != nil {
+		return nil, err
+	}
+	return &tokenID, nil
+}
+
 func HandleResponse(ctx *gin.Context, resp *response.BaseResponse, err error) {
 	if err != nil {
 		HandleError(ctx, err)

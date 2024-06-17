@@ -15,12 +15,12 @@ func (r *Repository) GetCache(ctx context.Context, key string, out any, opts ...
 		return errors.ErrUnsupported
 	}
 
-	val, err := r.rdb.Get(ctx, key).Result()
+	val, err := r.rdb.Get(ctx, key).Bytes()
 	if err != nil {
 		return err
 	}
 
-	err = json.Unmarshal([]byte(val), &out)
+	err = json.Unmarshal(val, &out)
 	if err != nil {
 		return err
 	}

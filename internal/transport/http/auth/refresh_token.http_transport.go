@@ -18,7 +18,15 @@ func (c *Controller) RefreshToken(ginCtx *gin.Context) {
 		return
 	}
 
+	tokenID, err := util.GetTokenIDFromContext(ctx)
+	if err != nil {
+		util.HandleError(ginCtx, constant.ErrInvalidToken)
+		ginCtx.Abort()
+		return
+	}
+
 	req.UserID = *userID
+	req.TokenID = *tokenID
 	resp, err := c.authService.RefreshToken(ctx, req)
 	util.HandleResponse(ginCtx, resp, err)
 }

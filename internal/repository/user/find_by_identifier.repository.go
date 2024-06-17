@@ -16,7 +16,7 @@ func (r *Repository) FindByIdentifier(ctx context.Context, identifier string) (*
 
 	result := new(entity.User)
 	cacheKey := cachekey.NewUserByIdentifierCacheKey(identifier)
-	err := r.cacheRepo.GetOrSetCache(ctx, cacheKey, result, func(ctx context.Context) (any, error) {
+	err := r.cacheRepo.GetOrSetCache(ctx, cacheKey, &result, func(ctx context.Context) (any, error) {
 		result := new(entity.User)
 		tx := util.GetTxFromContext(ctx, r.db)
 		err := tx.Where("email = ? OR username = ?", identifier, identifier).First(&result).Error

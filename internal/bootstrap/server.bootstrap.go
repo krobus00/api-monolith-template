@@ -12,6 +12,7 @@ import (
 	authSvc "github.com/api-monolith-template/internal/service/auth"
 	httpTransport "github.com/api-monolith-template/internal/transport/http"
 	authCtrl "github.com/api-monolith-template/internal/transport/http/auth"
+	middlewareCtrl "github.com/api-monolith-template/internal/transport/http/middleware"
 	"github.com/api-monolith-template/internal/util"
 	"github.com/sirupsen/logrus"
 )
@@ -45,9 +46,14 @@ func StartServer() {
 	// init service
 	authService := authSvc.
 		NewService().
-		WithUserRepository(userRepository)
+		WithUserRepository(userRepository).
+		WithCacheRepository(cacheRepository)
 
 	// init controller
+	middlewareController := middlewareCtrl.
+		NewController().
+		WithAuthService(authService).
+		WithCacheRepository(cacheRepository)
 	authController := authCtrl.
 		NewController().
 		WithAuthService(authService)
@@ -56,6 +62,7 @@ func StartServer() {
 	httpTransport.
 		NewTransport().
 		WithGinEngine(r).
+		WithMiddlewareController(middlewareController).
 		WithAuthController(authController).
 		InitRoute()
 

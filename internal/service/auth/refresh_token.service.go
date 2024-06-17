@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/api-monolith-template/internal/config"
+	"github.com/api-monolith-template/internal/model/cachekey"
 	"github.com/api-monolith-template/internal/model/request"
 	"github.com/api-monolith-template/internal/model/response"
 	"github.com/api-monolith-template/internal/util"
@@ -31,7 +32,12 @@ func (s *Service) RefreshToken(ctx context.Context, req *request.AuthRefreshReq)
 		return nil, err
 	}
 
-	// TODO: remove old token
+	cacheKey := cachekey.NewRefreshTokenCacheKey(req.UserID.String(), req.TokenID.String())
+	err = s.cacheRepository.DeleteCache(ctx, cacheKey)
+	if err != nil {
+		logger.Error(err)
+		return nil, err
+	}
 
 	return &response.BaseResponse{
 		Message: response.MessageOK,

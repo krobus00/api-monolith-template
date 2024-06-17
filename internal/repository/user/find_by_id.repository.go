@@ -17,7 +17,7 @@ func (r *Repository) FindByID(ctx context.Context, id uuid.UUID) (*entity.User, 
 
 	result := new(entity.User)
 	cacheKey := cachekey.NewUserByIDCacheKey(id.String())
-	err := r.cacheRepo.GetOrSetCache(ctx, cacheKey, result, func(ctx context.Context) (any, error) {
+	err := r.cacheRepo.GetOrSetCache(ctx, cacheKey, &result, func(ctx context.Context) (any, error) {
 		result := new(entity.User)
 		tx := util.GetTxFromContext(ctx, r.db)
 		err := tx.Where("id = ? ", id).First(&result).Error
