@@ -3,6 +3,7 @@ package user
 import (
 	"context"
 
+	"github.com/api-monolith-template/internal/model/cachekey"
 	"github.com/api-monolith-template/internal/model/entity"
 	"github.com/api-monolith-template/internal/util"
 	"github.com/sirupsen/logrus"
@@ -14,10 +15,18 @@ func (r *Repository) FindByEmail(ctx context.Context, email string) (*entity.Use
 	})
 
 	result := new(entity.User)
+	cacheKey := cachekey.NewUserByIdentifierCacheKey(email)
+	err := r.cacheRepo.GetOrSetCache(ctx, cacheKey, result, func(ctx context.Context) (any, error) {
+		result := new(entity.User)
+		tx := util.GetTxFromContext(ctx, r.db)
+		err := tx.Where("email = ? ", email).First(&result).Error
+		if err != nil {
+			return nil, err
+		}
 
-	tx := util.GetTxFromContext(ctx, r.db)
+		return result, nil
+	})
 
-	err := tx.Where("email = ?", email).First(&result).Error
 	if err != nil {
 		logger.Error(err)
 		return nil, err

@@ -3,6 +3,10 @@ log_level: "info" # warm
 graceful_shutdown_timeout: "30s"
 token:
   password_salt: "b5zaUPemaUN3YVPQ" # random 16 char
+  access_token_secret: "17A9Y63VUmMotuuS" # random char
+  access_token_duration: "1h"
+  refresh_token_secret: "17A9YPemaUN3YVPQ" # random char
+  refresh_token_duration: "30h"
 server:
   port: 8080
 database:
@@ -14,4 +18,11 @@ database:
   max_retry: 5
   max_idle_conns: 5
   max_open_conns: 20
+  max_conn_life_time: "1h"
+redis:
+  cache_dsn: "redis://user:password@localhost:6379/0?protocol=3"
+  default_cache_duration: "15m"
+  max_retry: 5
+  max_idle_conns: 5
+  max_active_conns: 20
   max_conn_life_time: "1h"

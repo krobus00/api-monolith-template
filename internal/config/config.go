@@ -24,6 +24,16 @@ type EnvConfig struct {
 	Token                   Token         `mapstructure:"token"`
 	Server                  Server        `mapstructure:"server"`
 	Database                Database      `mapstructure:"database"`
+	Redis                   Redis         `mapstructure:"redis"`
+}
+
+type Redis struct {
+	CacheDSN             string        `mapstructure:"cache_dsn"`
+	DefaultCacheDuration time.Duration `mapstructure:"default_cache_duration"`
+	MaxRetry             int           `mapstructure:"max_retry"`
+	MaxIdleConns         int           `mapstructure:"max_idle_conns"`
+	MaxActiveConns       int           `mapstructure:"max_active_conns"`
+	MaxConnLifetime      time.Duration `mapstructure:"max_conn_lifetime"`
 }
 
 type Token struct {

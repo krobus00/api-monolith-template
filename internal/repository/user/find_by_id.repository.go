@@ -3,6 +3,7 @@ package user
 import (
 	"context"
 
+	"github.com/api-monolith-template/internal/model/cachekey"
 	"github.com/api-monolith-template/internal/model/entity"
 	"github.com/api-monolith-template/internal/util"
 	"github.com/google/uuid"
@@ -15,10 +16,18 @@ func (r *Repository) FindByID(ctx context.Context, id uuid.UUID) (*entity.User, 
 	})
 
 	result := new(entity.User)
+	cacheKey := cachekey.NewUserByIDCacheKey(id.String())
+	err := r.cacheRepo.GetOrSetCache(ctx, cacheKey, result, func(ctx context.Context) (any, error) {
+		result := new(entity.User)
+		tx := util.GetTxFromContext(ctx, r.db)
+		err := tx.Where("id = ? ", id).First(&result).Error
+		if err != nil {
+			return nil, err
+		}
 
-	tx := util.GetTxFromContext(ctx, r.db)
+		return result, nil
+	})
 
-	err := tx.Where("id = ?", id).First(&result).Error
 	if err != nil {
 		logger.Error(err)
 		return nil, err
