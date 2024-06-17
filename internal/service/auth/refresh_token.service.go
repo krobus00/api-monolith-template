@@ -2,6 +2,7 @@ package auth
 
 import (
 	"context"
+	"time"
 
 	"github.com/api-monolith-template/internal/config"
 	"github.com/api-monolith-template/internal/model/request"
@@ -36,9 +37,9 @@ func (s *Service) RefreshToken(ctx context.Context, req *request.AuthRefreshReq)
 		Message: response.MessageOK,
 		Data: response.AuthResp{
 			AccessToken:           accessToken,
-			AccessTokenExpiredAt:  accessExpiredAt,
+			AccessTokenExpiredAt:  accessExpiredAt.Format(time.RFC3339),
 			RefreshToken:          refreshToken,
-			RefreshTokenExpiredAt: refreshExpiredAt,
+			RefreshTokenExpiredAt: refreshExpiredAt.Format(time.RFC3339),
 		},
 	}, nil
 }

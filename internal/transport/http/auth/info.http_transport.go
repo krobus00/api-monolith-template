@@ -20,11 +20,5 @@ func (c *Controller) Info(ginCtx *gin.Context) {
 
 	req.UserID = *userID
 	resp, err := c.authService.Info(ctx, req)
-	if err != nil {
-		util.HandleError(ginCtx, err)
-		ginCtx.Abort()
-		return
-	}
-
-	ginCtx.JSON(resp.StatusCode, resp)
+	util.HandleResponse(ginCtx, resp, err)
 }

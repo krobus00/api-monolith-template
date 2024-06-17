@@ -18,11 +18,5 @@ func (c *Controller) Login(ginCtx *gin.Context) {
 	}
 
 	resp, err := c.authService.Login(ctx, req)
-	if err != nil {
-		util.HandleError(ginCtx, err)
-		ginCtx.Abort()
-		return
-	}
-
-	ginCtx.JSON(resp.StatusCode, resp)
+	util.HandleResponse(ginCtx, resp, err)
 }

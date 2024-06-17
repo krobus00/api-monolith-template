@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"net/http"
+	"time"
 
 	"github.com/api-monolith-template/internal/constant"
 	"github.com/api-monolith-template/internal/model/request"
@@ -32,8 +33,8 @@ func (s *Service) Info(ctx context.Context, req *request.AuthInfoReq) (*response
 			Username:  user.Username,
 			Email:     user.Email,
 			Level:     user.Level,
-			CreatedAt: user.CreatedAt,
-			UpdatedAt: user.UpdatedAt,
+			CreatedAt: user.CreatedAt.Format(time.RFC3339),
+			UpdatedAt: user.UpdatedAt.Format(time.RFC3339),
 		},
 	}, nil
 }

@@ -1,8 +1,6 @@
 package util
 
 import (
-	"net/http"
-
 	"github.com/api-monolith-template/internal/constant"
 	"github.com/api-monolith-template/internal/model/response"
 	"github.com/gin-gonic/gin"
@@ -15,9 +13,10 @@ func HandleError(ctx *gin.Context, err error) {
 		ctx.JSON(cErr.StatusCode, cErr.ToResponse())
 	case validator.ValidationErrors:
 		validationErr := processValidationErr(cErr)
-		ctx.JSON(http.StatusInternalServerError, validationErr)
+		ctx.JSON(validationErr.StatusCode, validationErr)
 	default:
-		ctx.JSON(http.StatusInternalServerError, constant.ErrInternalServerError)
+		internalServerErr := constant.ErrInternalServerError.ToResponse()
+		ctx.JSON(internalServerErr.StatusCode, internalServerErr)
 	}
 }
 

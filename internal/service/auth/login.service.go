@@ -3,6 +3,7 @@ package auth
 import (
 	"context"
 	"errors"
+	"time"
 
 	"github.com/api-monolith-template/internal/config"
 	"github.com/api-monolith-template/internal/constant"
@@ -58,9 +59,9 @@ func (s *Service) Login(ctx context.Context, req *request.LoginReq) (*response.B
 		Message: response.MessageOK,
 		Data: response.AuthResp{
 			AccessToken:           accessToken,
-			AccessTokenExpiredAt:  accessExpiredAt,
+			AccessTokenExpiredAt:  accessExpiredAt.Format(time.RFC3339),
 			RefreshToken:          refreshToken,
-			RefreshTokenExpiredAt: refreshExpiredAt,
+			RefreshTokenExpiredAt: refreshExpiredAt.Format(time.RFC3339),
 		},
 	}, nil
 }
