@@ -26,6 +26,7 @@ func (t *Transport) InitRoute() {
 
 	authProtected := authGroup.Use(t.middlewareController.AuthMiddleware(constant.AccessTokenType))
 	authProtected.GET("/info", t.authController.Info)
+	authProtected.POST("/logout", t.authController.Logout)
 
 	// handle route not found
 	t.router.NoRoute(func(c *gin.Context) {

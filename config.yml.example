@@ -20,6 +20,7 @@ database:
   max_open_conns: 20
   max_conn_life_time: "1h"
 redis:
+  is_cache_disable: "false"
   cache_dsn: "redis://user:password@localhost:6379/0?protocol=3"
   default_cache_duration: "15m"
   max_retry: 5

@@ -178,6 +178,43 @@ curl --request POST \
 }
 ```
 
+### Logout
+#### Request
+
+**Method:** `POST`
+
+**URL:** `${{HOST}}/v1/auth/logout`
+
+**Headers:**
+- `Content-Type: application/json`
+- `Authorization: Bearer <ACCESS_TOKEN>`
+
+**Example cURL Command:**
+
+```bash
+curl --request POST \
+  --url ${{HOST}}/v1/auth/logout \
+  --header 'Content-Type: application/json' \
+  --header 'Authorization: Bearer <ACCESS_TOKEN>'
+```
+
+**Example Response:**
+```json
+{
+	"message": "invalid token",
+	"data": null,
+	"validationErrors": null
+}
+```
+
+```json
+{
+	"message": "ok",
+	"data": null,
+	"validationErrors": null
+}
+```
+
 ### User Info
 #### Request
 

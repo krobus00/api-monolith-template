@@ -21,3 +21,8 @@ type AuthRefreshReq struct {
 	UserID  uuid.UUID `json:"-"`
 	TokenID uuid.UUID `json:"-"`
 }
+
+type AuthLogoutReq struct {
+	UserID  uuid.UUID `json:"-"`
+	TokenID uuid.UUID `json:"-"`
+}

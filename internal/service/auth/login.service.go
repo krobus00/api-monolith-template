@@ -41,22 +41,21 @@ func (s *Service) Login(ctx context.Context, req *request.LoginReq) (*response.B
 		return nil, constant.ErrPasswordNotMatch
 	}
 
-	accessTokenID := uuid.New()
-	accessToken, accessExpiredAt, err := util.GenerateToken(config.Env.Token.AccessTokenSecret, user.ID.String(), accessTokenID.String(), config.Env.Token.AccessTokenDuration)
+	tokenPairID := uuid.New()
+	accessToken, accessExpiredAt, err := util.GenerateToken(config.Env.Token.AccessTokenSecret, user.ID.String(), tokenPairID.String(), config.Env.Token.AccessTokenDuration)
 	if err != nil {
 		logger.Error(err)
 		return nil, err
 	}
 
-	refreshTokenID := uuid.New()
-	refreshToken, refreshExpiredAt, err := util.GenerateToken(config.Env.Token.RefreshTokenSecret, user.ID.String(), refreshTokenID.String(), config.Env.Token.RefreshTokenDuration)
+	refreshToken, refreshExpiredAt, err := util.GenerateToken(config.Env.Token.RefreshTokenSecret, user.ID.String(), tokenPairID.String(), config.Env.Token.RefreshTokenDuration)
 	if err != nil {
 		logger.Error(err)
 		return nil, err
 	}
 
-	cacheKey := cachekey.NewRefreshTokenCacheKey(user.ID.String(), refreshTokenID.String())
-	err = s.cacheRepository.SetCache(ctx, cacheKey, refreshToken, cache.WithCustomExpiredDuration(config.Env.Token.RefreshTokenDuration))
+	cacheKey := cachekey.NewRefreshTokenCacheKey(user.ID.String(), tokenPairID.String())
+	err = s.cacheRepository.SetCache(ctx, cacheKey, tokenPairID.String(), cache.WithCustomExpiredDuration(config.Env.Token.RefreshTokenDuration))
 	if err != nil {
 		logger.Error(err)
 		return nil, err

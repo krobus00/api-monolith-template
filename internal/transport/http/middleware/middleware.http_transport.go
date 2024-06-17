@@ -17,6 +17,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v4"
 	"github.com/google/uuid"
+	"github.com/redis/go-redis/v9"
 	"github.com/sirupsen/logrus"
 )
 
@@ -161,12 +162,23 @@ func (c *Controller) AuthMiddleware(tokenType string) gin.HandlerFunc {
 		ginCtx.Set(string(constant.TokenID), tokenID)
 		ginCtx.Request = ginCtx.Request.WithContext(context.WithValue(ginCtx.Request.Context(), constant.TokenID, tokenID))
 
-		if tokenType == constant.RefreshTokenType {
+		switch tokenType {
+		case constant.RefreshTokenType:
 			// check refresh token is valid or not
 			cacheKey := cachekey.NewRefreshTokenCacheKey(userID, tokenID)
 			existingToken := ""
 			err = c.cacheRepository.GetCache(ginCtx.Request.Context(), cacheKey, &existingToken)
 			if err != nil {
+				ginCtx.JSON(cErr.StatusCode, cErr.ToResponse())
+				ginCtx.Abort()
+				return
+			}
+		case constant.AccessTokenType:
+			// check if current access token in blacklist
+			cacheKey := cachekey.NewAccessTokenBlacklistCacheKey(userID, tokenID)
+			blacklistToken := ""
+			err = c.cacheRepository.GetCache(ginCtx.Request.Context(), cacheKey, &blacklistToken)
+			if (err != nil && !errors.Is(err, redis.Nil)) || blacklistToken != "" {
 				ginCtx.JSON(cErr.StatusCode, cErr.ToResponse())
 				ginCtx.Abort()
 				return
