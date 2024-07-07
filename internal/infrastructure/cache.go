@@ -1,6 +1,9 @@
 package infrastructure
 
 import (
+	"context"
+	"errors"
+
 	"github.com/api-monolith-template/internal/config"
 	"github.com/api-monolith-template/internal/util"
 	"github.com/redis/go-redis/v9"
@@ -15,5 +18,18 @@ func NewRedisClient() *redis.Client {
 	opts.MaxRetries = config.Env.Redis.MaxRetry
 	opts.ConnMaxLifetime = config.Env.Redis.MaxConnLifetime
 
-	return redis.NewClient(opts)
+	rdb := redis.NewClient(opts)
+
+	MapHealthCheck["redis"] = func(ctx context.Context) error {
+		if rdb == nil {
+			return errors.New("disconnect")
+		}
+		_, err := rdb.Ping(ctx).Result()
+		if err != nil {
+			return err
+		}
+		return nil
+	}
+
+	return rdb
 }

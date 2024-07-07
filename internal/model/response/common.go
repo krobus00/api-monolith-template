@@ -39,3 +39,26 @@ func NewResponseOK() *BaseResponse {
 		Message: MessageOK,
 	}
 }
+
+type GetHealthCheckMemoryResp struct {
+	Alloc      uint64 `json:"alloc"`
+	TotalAlloc uint64 `json:"totalAlloc"`
+	Sys        uint64 `json:"sys"`
+	HeapAlloc  uint64 `json:"heapAlloc"`
+	HeapSys    uint64 `json:"heapSys"`
+}
+
+type GetHealthCheckServiceStatusResp struct {
+	Name string `json:"name"`
+	IsUp bool   `json:"isUp"`
+}
+
+type GetHealthCheckResp struct {
+	Status          string                            `json:"status"`
+	Environtment    string                            `json:"environtment"`
+	Version         string                            `json:"version"`
+	GoVersion       string                            `json:"goVersion"`
+	GoRoutine       int                               `json:"goRoutine"`
+	Memory          GetHealthCheckMemoryResp          `json:"memory"`
+	ServiceStatuses []GetHealthCheckServiceStatusResp `json:"serviceStatuses"`
+}

@@ -2,19 +2,11 @@ package http
 
 import (
 	"github.com/api-monolith-template/internal/constant"
-	"github.com/api-monolith-template/internal/model/response"
 	"github.com/gin-gonic/gin"
 )
 
 func (t *Transport) InitRoute() {
 	t.router.Use(t.middlewareController.CustomPanicHandler(), t.middlewareController.LoggingMiddleware())
-
-	// handle health check
-	internalGroup := t.router.Group("/_internal")
-	internalGroup.GET("/healthz", func(c *gin.Context) {
-		resp := response.NewResponseOK()
-		c.JSON(resp.StatusCode, resp)
-	})
 
 	v1Group := t.router.Group("/v1")
 

@@ -1,6 +1,8 @@
 package infrastructure
 
 import (
+	"context"
+	"errors"
 	"time"
 
 	"github.com/api-monolith-template/internal/config"
@@ -34,6 +36,19 @@ func InitializeDBConn() {
 		DB.Logger = DB.Logger.LogMode(gormLogger.Warn)
 	default:
 		DB.Logger = DB.Logger.LogMode(gormLogger.Info)
+	}
+
+	MapHealthCheck["database"] = func(ctx context.Context) error {
+		if DB == nil {
+			return errors.New("disconnect")
+		}
+
+		sqlDB, err := DB.WithContext(ctx).DB()
+		if err != nil {
+			return err
+		}
+
+		return sqlDB.Ping()
 	}
 
 	logrus.Info("connection to database Server success...")
